@@ -1,8 +1,8 @@
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;   // библиотека log4j2: фабрика логгеров
+import org.apache.logging.log4j.Logger;       // интерфейс логгера log4j2
 
-import java.awt.*;
-import java.awt.geom.Ellipse2D;
+import java.awt.*;                           // базовые графические классы AWT
+import java.awt.geom.Ellipse2D;              // класс для рисования эллипсов/окружностей
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -13,10 +13,18 @@ import java.util.Random;
  */
 public class RandomShapeGenerator {
 
+    /** Логгер для записи информации о процессе генерации фигур. */
     private static final Logger LOGGER = LogManager.getLogger(RandomShapeGenerator.class);
 
+    /** Источник псевдослучайных чисел для генерации координат и размеров. */
     private final Random random = new Random();
 
+    /**
+     * Генерирует набор фигур согласно параметрам и передает их панели.
+     * Также записывает в лог состав конфигурации и общее количество созданных фигур.
+     * @param params параметры генерации (количество фигур, область, кучность, сетка)
+     * @param panel  панель, на которой будут отображены сгенерированные фигуры
+     */
     public void generate(InputParameters params, DrawPanel panel) {
         LOGGER.info(
                 "Generating shapes: lines=" + params.getLineCount()

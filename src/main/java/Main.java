@@ -7,24 +7,33 @@ import java.awt.*;
 
 /**
  * Главный класс приложения генерации случайного рисунка.
- * Создает окно, элементы управления и запускает генерацию фигур.
+ * Создает главное окно, размещает элементы управления и запускает генерацию фигур.
  */
 public class Main {
 
+    /** Логгер приложения для записи служебных сообщений. */
     private static final Logger LOGGER = LogManager.getLogger(Main.class);
 
+    /**
+     * Точка входа в приложение.
+     */
     public static void main(String[] args) {
         System.out.println("START MAIN");
         LOGGER.info("Application started");
         SwingUtilities.invokeLater(Main::createAndShowGui);
     }
 
+    /**
+     * Создает и настраивает главное окно приложения.
+     * Формирует панели ввода параметров, область рисования и статусную строку.
+     */
     private static void createAndShowGui() {
         JFrame frame = new JFrame("Генерация случайного рисунка");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         DrawPanel drawPanel = new DrawPanel();
 
+        // количество символов в текстовых полях
         int fieldColumns = 5;
 
         // ---------- блок количества фигур ----------
@@ -113,20 +122,61 @@ public class Main {
         // ---------- обработчики кнопок ----------
         btnGenerate.addActionListener(e -> {
             try {
+                int lineCount      = Integer.parseInt(tfLines.getText());
+                int circleCount    = Integer.parseInt(tfCircles.getText());
+                int rectCount      = Integer.parseInt(tfRects.getText());
+                int triangleCount  = Integer.parseInt(tfTriangles.getText());
+                int parabolaCount  = Integer.parseInt(tfParabolas.getText());
+                int trapezoidCount = Integer.parseInt(tfTrapezoids.getText());
+
+                double minX    = Double.parseDouble(tfMinX.getText());
+                double maxX    = Double.parseDouble(tfMaxX.getText());
+                double minY    = Double.parseDouble(tfMinY.getText());
+                double maxY    = Double.parseDouble(tfMaxY.getText());
+                double density = Double.parseDouble(tfDensity.getText());
+                double grid    = Double.parseDouble(tfGridStep.getText());
+
+                // логическая валидация
+                if (minX >= maxX || minY >= maxY) {
+                    JOptionPane.showMessageDialog(frame,
+                            "Минимальные значения координат должны быть меньше максимальных.",
+                            "Ошибка параметров", JOptionPane.ERROR_MESSAGE);
+                    LOGGER.warn("Invalid bounds: minX=" + minX + ", maxX=" + maxX +
+                            ", minY=" + minY + ", maxY=" + maxY);
+                    return;
+                }
+
+                if (density < 0 || density > 1) {
+                    JOptionPane.showMessageDialog(frame,
+                            "Параметр \"Кучность\" должен быть в диапазоне от 0 до 1.",
+                            "Ошибка параметров", JOptionPane.ERROR_MESSAGE);
+                    LOGGER.warn("Invalid density value: " + density);
+                    return;
+                }
+
+                if (grid < 0) {
+                    JOptionPane.showMessageDialog(frame,
+                            "Шаг сетки не может быть отрицательным.",
+                            "Ошибка параметров", JOptionPane.ERROR_MESSAGE);
+                    LOGGER.warn("Invalid grid step: " + grid);
+                    return;
+                }
+
                 InputParameters params = new InputParameters(
-                        Integer.parseInt(tfLines.getText()),
-                        Integer.parseInt(tfCircles.getText()),
-                        Integer.parseInt(tfRects.getText()),
-                        Integer.parseInt(tfTriangles.getText()),
-                        Integer.parseInt(tfParabolas.getText()),
-                        Integer.parseInt(tfTrapezoids.getText()),
-                        Double.parseDouble(tfMinX.getText()),
-                        Double.parseDouble(tfMaxX.getText()),
-                        Double.parseDouble(tfMinY.getText()),
-                        Double.parseDouble(tfMaxY.getText()),
-                        Double.parseDouble(tfDensity.getText()),
-                        Double.parseDouble(tfGridStep.getText())
+                        lineCount,
+                        circleCount,
+                        rectCount,
+                        triangleCount,
+                        parabolaCount,
+                        trapezoidCount,
+                        minX,
+                        maxX,
+                        minY,
+                        maxY,
+                        density,
+                        grid
                 );
+
                 LOGGER.info("Drawing generation started");
                 RandomShapeGenerator generator = new RandomShapeGenerator();
                 generator.generate(params, drawPanel);
